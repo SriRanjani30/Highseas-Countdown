@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Countdown Timer</title>
+    <style>
+        :root {
+            --light-bg: #f0f4f8;
+            --light-text: #333;
+            --dark-bg: #1e293b;
+            --dark-text: #f8fafc;
+            --accent: #6366f1;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--light-bg);
+            color: var(--light-text);
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .settings {
+            margin-bottom: 20px;
+        }
+        .settings input, .settings button, .settings select {
+            margin: 5px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+        .settings button {
+            background-color: var(--accent);
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .settings button:hover {
+            background-color: #4f46e5;
+        }
+        .countdown {
+            padding: 20px;
+            background: var(--dark-bg);
+            color: var(--dark-text);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .countdown h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        .time {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .time div {
+            text-align: center;
+            flex: 1;
+        }
+        .time div span {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .time div small {
+            font-size: 0.9rem;
+        }
+        .dark-mode {
+            background: var(--dark-bg);
+            color: var(--dark-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="settings">
+            <input type="text" id="event-name" placeholder="Enter Event Name" />
+            <input type="datetime-local" id="event-date" />
+            <button onclick="startCountdown()">Set Event</button>
+            <select id="theme-selector" onchange="toggleTheme()">
+                <option value="light">Light Theme</option>
+                <option value="dark">Dark Theme</option>
+            </select>
+        </div>
+        <div class="countdown">
+            <h1 id="event-title">Countdown to the Event</h1>
+            <div class="time">
+                <div>
+                    <span id="days">00</span>
+                    <small>Days</small>
+                </div>
+                <div>
+                    <span id="hours">00</span>
+                    <small>Hours</small>
+                </div>
+                <div>
+                    <span id="minutes">00</span>
+                    <small>Minutes</small>
+                </div>
+                <div>
+                    <span id="seconds">00</span>
+                    <small>Seconds</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let countdownInterval;
+        function startCountdown() {
+            const eventName = document.getElementById("event-name").value;
+            const eventDateInput = document.getElementById("event-date").value;
+            const eventDate = new Date(eventDateInput).getTime();
+            if (!eventName || !eventDateInput) {
+                alert("Please enter both an event name and date.");
+                return;
+            }
+            document.getElementById("event-title").textContent = `Countdown to ${eventName}`;
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const timeLeft = eventDate - now;
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                document.getElementById("days").textContent = days.toString().padStart(2, '0');
+                document.getElementById("hours").textContent = hours.toString().padStart(2, '0');
+                document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
+                document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
+                if (timeLeft < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById("event-title").textContent = `${eventName} has started!`;
+                    document.querySelector(".time").style.display = "none";
+                }
+            }, 1000);
+        }
+        function toggleTheme() {
+            const theme = document.getElementById("theme-selector").value;
+            document.body.className = theme === "dark" ? "dark-mode" : "";
+        }
+    </script>
+</body>
+</html>
